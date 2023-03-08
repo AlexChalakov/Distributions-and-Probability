@@ -70,7 +70,6 @@ num, point3, point4, point5):
     return (prob1, prob2, MEAN_t, MEDIAN_t, MEAN_d, VARIANCE_d,
 prob3, prob4, ALE)
 
-
 # Task2
 # from dhCheck_Task2 import dhCheckCorrectness
 def Task2(num, table, eventA, eventB, probs):
@@ -97,7 +96,7 @@ def Task2(num, table, eventA, eventB, probs):
     #print("Union is", union)
 
     bayes = intersection / prob2
-    print(bayes)
+    #print(bayes)
     if intersection == union:
         IsInd = 1
     else:
@@ -105,19 +104,75 @@ def Task2(num, table, eventA, eventB, probs):
     print(IsInd)
 
     # Prob3
-    pt = np.sum(probs)
-    prob3 = pt / len(probs)
-    #prob3 = np.sum(probs) / (num - np.sum(data[:,3]))
-    #print(num - np.sum(data[:,3]))
+    # Note down the positives
+    condY3T = 0.7
+    condY4T = 0.6
+    condY5T = 0.5
+    condX5T = 0.63
+    condX6T = 0.44
+    condX7T = 0.36
+
+    # Get the probability of rows
+    rowY3 = data[:][0]
+    rowY3sum = np.sum(rowY3)
+    probY3 = rowY3sum / num
+
+    rowY4 = data[:][1]
+    rowY4sum = np.sum(rowY4)
+    probY4 = rowY4sum / num
+
+    rowY5 = data[:][2]
+    rowY5sum = np.sum(rowY5)
+    probY5 = rowY5sum / num
+
+    # Get the intersections
+    # P=(Y=... n T)
+    intY3 = condY3T * probY3
+    intY4 = condY4T * probY4
+    intY5 = condY5T *probY5
+
+    # Calculate total probability
+    prob3  = intY3 + intY4 + intY5
     print("Prob3 is ", prob3)
 
     # Prob4
-    
-    #prob4 = np.sum(data[:,3]) / (num - np.sum(data[:,3]))
-    #prob4 = 1 / np.sum(data[:,3])
+    # Do the same thing for the columns like it was done for the rows
+    columnX5 = data[:,0]
+    columnX5sum = np.sum(columnX5)
+    probX5 = columnX5sum / num
+
+    columnX6 = data[:,1]
+    columnX6sum = np.sum(columnX6)
+    probX6 = columnX6sum / num
+
+    columnX7 = data[:,2]
+    columnX7sum = np.sum(columnX7)
+    probX7 = columnX7sum / num
+
+    columnX8 = data[:,3]
+    columnX8sum = np.sum(columnX8)
+    probX8 = columnX8sum / num
+
+    # Intersections agains
+    intX5 = condX5T * probX5
+    intX6 = condX6T * probX6
+    intX7 = condX7T * probX7
+
+    # Bayes Theorem
+    intX8 = prob3 - (intX5 + intX6 + intX7)
+    reverseX8 = intX8 / probX8
+    prob4 = (reverseX8 * probX8)/ prob3
     print("Prob4 is", prob4)
 
     return (prob1, prob2, IsInd, prob3, prob4)
+
+#from dhCheck_Task3 import dhCheckCorrectness
+def Task3(x, y, z, num1, num2, num3, num4, bound_y, bound_z, c,
+se_bound, ml_bound, x_bound, x_initial):
+    # TODO
+
+
+    return (weights_b, weights_d, s_num5, l_num5, x_add)
 
 if __name__ == "__main__":
 
@@ -135,6 +190,7 @@ num, point3, point4, point5)
     
     """
     # TASK 2
+    """
     num = 120
     eventA = 2 #column 2 of table
     eventB = [0,1] #row 0 and row 1 of table
@@ -142,4 +198,18 @@ num, point3, point4, point5)
     table = [[6, 10, 11, 9], [9, 12, 15, 8], [7, 14, 10, 9]]
 
     prob1, prob2, IsInd, prob3, prob4 = Task2(num, table, eventA, eventB, probs)
+    """
+    # TASK 3
+    x = [[5,4,8,8,2,5,5,7,8,8],[3,7,7,2,2,5,10,4,6,3],[8,3,6,7,9,10,6,2,2,3],[9,3,9,3,10,4,2,3,7,5],
+    [4,9,6,6,10,3,8,8,4,6]]
+    y = [176,170,215,146,228,145,183,151,160,151]
+    z = [352,384,471,358,412,345,449,357,366,349]
+    num1, num2, num3, num4, bound_y, bound_z = 5, 6, 8, 4, 160, 600
+    c = [11, 6, 8, 10, 9]
+    se_bound = 1000
+    ml_bound = 2000
+    x_bound = [30,50,20,45,50]
+    x_initial = [3,5,4,2,1]
+    weights_b, weights_d, s_num5, l_num5, x_add = Task3(x, y, z, num1, num2, num3, num4, bound_y, bound_z, c,
+se_bound, ml_bound, x_bound, x_initial)
     
