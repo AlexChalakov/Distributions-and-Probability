@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.stats import triang, lognorm, pareto
+from scipy.optimize import curve_fit
 
 #Task1
 #from dhCheck_Task1 import dhCheckCorrectness
@@ -170,6 +171,34 @@ def Task2(num, table, eventA, eventB, probs):
 def Task3(x, y, z, num1, num2, num3, num4, bound_y, bound_z, c,
 se_bound, ml_bound, x_bound, x_initial):
     # TODO
+    # Linear regression using curve_fit from workshop
+    # weights_b, weights_d
+    x = np.array(x)
+    y = np.array(y)
+    z = np.array(z)
+    def fn(xdata, b0, b1, b2, b3, b4, b5):
+        return b0 + b1*xdata[0] + b2*xdata[1] + b3*xdata[2] + b4*xdata[3] + b5*xdata[4]
+    weights_b, pcov = curve_fit(fn, x, y)
+    weights_d, pcov = curve_fit(fn, x, z)
+    print(weights_b, weights_d)
+
+    #10 historical pairs
+    # s_num5, l_num5
+    pairs = 10
+    safeguard = weights_b[0] + num1*weights_b[1] + num2*weights_b[2] + num3*weights_b[3] + num4*weights_b[4]
+    maintenance = weights_d[0] + num1*weights_d[1] + num2*weights_d[2] + num3*weights_d[3] + num4*weights_d[4]
+
+    #print(safeguard)
+    for s_num5 in range(pairs + 1):
+        if safeguard + s_num5*weights_b[5] >= bound_y:
+                s_num5 = safeguard + s_num5*weights_b[5]
+                print(s_num5)
+
+    # x_add
+    # use linprog - create the parameters beforehand
+    Aie = [safeguard, maintenance]
+
+    
 
 
     return (weights_b, weights_d, s_num5, l_num5, x_add)
@@ -210,6 +239,7 @@ num, point3, point4, point5)
     ml_bound = 2000
     x_bound = [30,50,20,45,50]
     x_initial = [3,5,4,2,1]
+
     weights_b, weights_d, s_num5, l_num5, x_add = Task3(x, y, z, num1, num2, num3, num4, bound_y, bound_z, c,
 se_bound, ml_bound, x_bound, x_initial)
     
