@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.stats import triang, lognorm, pareto
-from scipy.optimize import curve_fit
+from scipy.optimize import curve_fit, linprog
 
 #Task1
 #from dhCheck_Task1 import dhCheckCorrectness
@@ -92,12 +92,16 @@ def Task2(num, table, eventA, eventB, probs):
     
     # IsInd
     intersection = prob1 * prob2
-    #print("Intersection is", intersection)
-    union = prob1 + prob2 - (prob1*prob2)
-    #print("Union is", union)
+    union = 0
+    for rows in eventB:
+        for i in range(0, len(data[rows])):
+            if i == eventA:
+                union += data[rows][i]
 
-    bayes = intersection / prob2
-    #print(bayes)
+    union = union / num
+    #print("Union is", union)
+    #print("Intersection is", intersection)
+
     if intersection == union:
         IsInd = 1
     else:
@@ -106,12 +110,12 @@ def Task2(num, table, eventA, eventB, probs):
 
     # Prob3
     # Note down the positives
-    condY3T = 0.7
-    condY4T = 0.6
-    condY5T = 0.5
-    condX5T = 0.63
-    condX6T = 0.44
-    condX7T = 0.36
+    condY3T = probs[0]
+    condY4T = probs[1]
+    condY5T = probs[2]
+    condX5T = probs[3]
+    condX6T = probs[4]
+    condX7T = probs[5]
 
     # Get the probability of rows
     rowY3 = data[:][0]
@@ -176,30 +180,73 @@ se_bound, ml_bound, x_bound, x_initial):
     x = np.array(x)
     y = np.array(y)
     z = np.array(z)
-    def fn(xdata, b0, b1, b2, b3, b4, b5):
+    def fn_x(xdata, b0, b1, b2, b3, b4, b5):
         return b0 + b1*xdata[0] + b2*xdata[1] + b3*xdata[2] + b4*xdata[3] + b5*xdata[4]
-    weights_b, pcov = curve_fit(fn, x, y)
-    weights_d, pcov = curve_fit(fn, x, z)
+    def fn_d(ydata, d0, d1, d2, d3, d4, d5):
+        return d0 + d1*ydata[0] + d2*ydata[1] + d3*ydata[2] + d4*ydata[3] + d5*ydata[4]
+    weights_b, pcov_b = curve_fit(fn_x, x, y)
+    weights_d, pcov_d = curve_fit(fn_d, x, z)
     print(weights_b, weights_d)
 
     #10 historical pairs
     # s_num5, l_num5
-    pairs = 10
+    #num5 = 10
     safeguard = weights_b[0] + num1*weights_b[1] + num2*weights_b[2] + num3*weights_b[3] + num4*weights_b[4]
     maintenance = weights_d[0] + num1*weights_d[1] + num2*weights_d[2] + num3*weights_d[3] + num4*weights_d[4]
 
+    s_num5 = (bound_y - safeguard) / weights_b[5]
+    print(s_num5)
+
+    l_num5 = (bound_z - maintenance) / weights_d[5]
+    print(l_num5)
+
     #print(safeguard)
-    for s_num5 in range(pairs + 1):
-        if safeguard + s_num5*weights_b[5] >= bound_y:
-                s_num5 = safeguard + s_num5*weights_b[5]
-                print(s_num5)
+    #for s_num5 in range(11):
+        #print(safeguard + s_num5*weights_b[5])
+        #if safeguard + s_num5*weights_b[5] >= bound_y:
+                #break
+
+    #for l_num5 in range(11):
+        #print(maintenance + l_num5*weights_d[5])
+        #if maintenance + l_num5*weights_d[5] <= bound_z:
+            #if(num5 > l_num5):
+               # l_num5 = l_num5
+    #print(l_num5)
 
     # x_add
     # use linprog - create the parameters beforehand
-    Aie = [safeguard, maintenance]
+    safeguardarr = [weights_b[0], weights_b[1], weights_b[2], weights_b[3], weights_b[4]]
+    maintenancearr = [weights_d[0], weights_d[1], weights_d[2], weights_d[3], weights_d[4]]
 
-    
+    Aie = [safeguardarr, maintenancearr]
+    bie = [-se_bound, ml_bound]
 
+    x_bound1 = [0 ,x_bound[0]-x_initial[0]]
+    x_bound2 = [0 ,x_bound[1]-x_initial[1]]
+    x_bound3 = [0 ,x_bound[2]-x_initial[2]]
+    x_bound4 = [0 ,x_bound[3]-x_initial[3]]
+    x_bound5 = [0 ,x_bound[4]-x_initial[4]]
+    bounds = [x_bound1, x_bound2, x_bound3, x_bound4, x_bound5]
+  
+    #print(c)
+    #print(Aie)
+    #print(bie)
+    #print(bounds)
+    x_add = []
+    Aeq = None
+    beq = None
+
+    linprogg = linprog(c, A_ub= Aie, b_ub= bie, A_eq= Aeq, b_eq= beq, bounds= bounds)
+    print(linprogg)
+    x = linprogg.x
+
+    for i in range(5):
+        #print(x[i])
+        #print(x_initial[i])
+        x[i] = x[i] - x_initial[i]
+        x_add.append(round(x[i]))
+
+    print("X_add is ", x_add)
 
     return (weights_b, weights_d, s_num5, l_num5, x_add)
 
@@ -216,7 +263,6 @@ if __name__ == "__main__":
     data = [11, 15, 9, 5, 3, 14, 16, 15, 12, 10, 11, 4, 7, 12, 6]
     prob1, prob2, MEAN_t, MEDIAN_t, MEAN_d, VARIANCE_d,prob3, prob4, ALE = Task1(a, b, c, point1, point2, data, mu, sigma, xm, alpha,
 num, point3, point4, point5)
-    
     """
     # TASK 2
     """
@@ -242,4 +288,3 @@ num, point3, point4, point5)
 
     weights_b, weights_d, s_num5, l_num5, x_add = Task3(x, y, z, num1, num2, num3, num4, bound_y, bound_z, c,
 se_bound, ml_bound, x_bound, x_initial)
-    
