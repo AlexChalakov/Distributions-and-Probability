@@ -15,29 +15,30 @@ num, point3, point4, point5):
     # prob 1
     # F(x) = [(x-𝒂)²]/[(𝒃-𝒂)(𝒄-𝒂)] for 𝒂 ≤ x < 𝒄
     prob1 = tridis.cdf(point1)
-    print("Prob1 is ",prob1)
+    #print("Prob1 is ",prob1)
 
     # prob 2
     # F(x) = 1 - [(𝒃-x)²]/[(𝒃-𝒂)(𝒃-𝒄)] for 𝒄 ≤ x ≤ 𝒃
     prob2 = tridis.cdf(point2)
-    print("Prob2 is ", prob2)
+    prob2 = 1 - prob2
+    #print("Prob2 is ", prob2)
 
     # mean_t
     MEAN_t = tridis.mean()
-    print("MEAN_t is ", MEAN_t)
+    #print("MEAN_t is ", MEAN_t)
 
     # median_t
     MEDIAN_t = tridis.median()
-    print("MEDIAN_t is ", MEDIAN_t)
+    #print("MEDIAN_t is ", MEDIAN_t)
 
     # dataset
     # mean_d
     MEAN_d = np.mean(data)
-    print("MEAN_d is", MEAN_d)
+    #print("MEAN_d is", MEAN_d)
 
     # variance_d
     VARIANCE_d = np.var(data, ddof=0)
-    print("VARIANCE_d is ", VARIANCE_d)
+    #print("VARIANCE_d is ", VARIANCE_d)
 
     # flaw A
     # Log Norm distribution
@@ -49,15 +50,15 @@ num, point3, point4, point5):
 
     # total impact - sum of impacts caused by both flows
     totalImpact = lognorm + pareto
-    print("total impact is ", totalImpact)
+    #print("total impact is ", totalImpact)
 
     # prob 3
     prob3 = np.sum(totalImpact > point3) / num
-    print("Prob3 is ", prob3)
+    #print("Prob3 is ", prob3)
 
     # prob 4
     prob4 = np.sum((totalImpact >= point4) & (totalImpact <= point5)) / num
-    print("Prob4 is ", prob4)
+    #print("Prob4 is ", prob4)
 
     # ALE
     # AV = MEDIAN_t
@@ -65,7 +66,7 @@ num, point3, point4, point5):
     # EF = prob3
     SLEex = MEDIAN_t * prob3
     ALE = MEAN_d * SLEex
-    print("ALE is ", ALE)
+    #print("ALE is ", ALE)
 
 
     return (prob1, prob2, MEAN_t, MEDIAN_t, MEAN_d, VARIANCE_d,
@@ -79,7 +80,7 @@ def Task2(num, table, eventA, eventB, probs):
     column = data[:,eventA]
     columnsum = np.sum(column)
     prob1 = columnsum / num
-    print("Prob1 is ", prob1)
+    #print("Prob1 is ", prob1)
 
     # Prob2 with bayes, eventB
     row1 = data[:][eventB[0]]
@@ -88,7 +89,7 @@ def Task2(num, table, eventA, eventB, probs):
     row2sum = np.sum(row2)
     rows = np.sum(row1sum + row2sum)
     prob2 = rows / num
-    print("Prob2 is ", prob2)
+    #print("Prob2 is ", prob2)
     
     # IsInd
     intersection = prob1 * prob2
@@ -106,7 +107,7 @@ def Task2(num, table, eventA, eventB, probs):
         IsInd = 1
     else:
         IsInd = 0
-    print(IsInd)
+    #print(IsInd)
 
     # Prob3
     # Note down the positives
@@ -138,7 +139,7 @@ def Task2(num, table, eventA, eventB, probs):
 
     # Calculate total probability
     prob3  = intY3 + intY4 + intY5
-    print("Prob3 is ", prob3)
+    #print("Prob3 is ", prob3)
 
     # Prob4
     # Do the same thing for the columns like it was done for the rows
@@ -167,14 +168,13 @@ def Task2(num, table, eventA, eventB, probs):
     intX8 = prob3 - (intX5 + intX6 + intX7)
     reverseX8 = intX8 / probX8
     prob4 = (reverseX8 * probX8)/ prob3
-    print("Prob4 is", prob4)
+    #print("Prob4 is", prob4)
 
     return (prob1, prob2, IsInd, prob3, prob4)
 
 #from dhCheck_Task3 import dhCheckCorrectness
 def Task3(x, y, z, num1, num2, num3, num4, bound_y, bound_z, c,
 se_bound, ml_bound, x_bound, x_initial):
-    # TODO
     # Linear regression using curve_fit from workshop
     # weights_b, weights_d
     x = np.array(x)
@@ -186,7 +186,7 @@ se_bound, ml_bound, x_bound, x_initial):
         return d0 + d1*ydata[0] + d2*ydata[1] + d3*ydata[2] + d4*ydata[3] + d5*ydata[4]
     weights_b, pcov_b = curve_fit(fn_x, x, y)
     weights_d, pcov_d = curve_fit(fn_d, x, z)
-    print(weights_b, weights_d)
+    #print(weights_b, weights_d)
 
     #10 historical pairs
     # s_num5, l_num5
@@ -195,56 +195,35 @@ se_bound, ml_bound, x_bound, x_initial):
     maintenance = weights_d[0] + num1*weights_d[1] + num2*weights_d[2] + num3*weights_d[3] + num4*weights_d[4]
 
     s_num5 = (bound_y - safeguard) / weights_b[5]
-    print(s_num5)
+    #print(s_num5)
 
     l_num5 = (bound_z - maintenance) / weights_d[5]
-    print(l_num5)
-
-    #print(safeguard)
-    #for s_num5 in range(11):
-        #print(safeguard + s_num5*weights_b[5])
-        #if safeguard + s_num5*weights_b[5] >= bound_y:
-                #break
-
-    #for l_num5 in range(11):
-        #print(maintenance + l_num5*weights_d[5])
-        #if maintenance + l_num5*weights_d[5] <= bound_z:
-            #if(num5 > l_num5):
-               # l_num5 = l_num5
     #print(l_num5)
 
     # x_add
     # use linprog - create the parameters beforehand
-    safeguardarr = [weights_b[0], weights_b[1], weights_b[2], weights_b[3], weights_b[4]]
-    maintenancearr = [weights_d[0], weights_d[1], weights_d[2], weights_d[3], weights_d[4]]
+    #safeguardarr = [weights_b[0], weights_b[1], weights_b[2], weights_b[3], weights_b[4]]
+    #maintenancearr = [weights_d[0], weights_d[1], weights_d[2], weights_d[3], weights_d[4]]
+    safeguardarr = weights_b[1:]
+    maintenancearr = weights_d[1:]
 
-    Aie = [safeguardarr, maintenancearr]
-    bie = [-se_bound, ml_bound]
+    Aie = [-safeguardarr, maintenancearr]
+    bie = [-se_bound + weights_b[0], ml_bound - weights_d[0]] #added + weights_b[0] and - weights_d[0]
 
-    x_bound1 = [0 ,x_bound[0]-x_initial[0]]
-    x_bound2 = [0 ,x_bound[1]-x_initial[1]]
-    x_bound3 = [0 ,x_bound[2]-x_initial[2]]
-    x_bound4 = [0 ,x_bound[3]-x_initial[3]]
-    x_bound5 = [0 ,x_bound[4]-x_initial[4]]
+    x_bound1 = [x_initial[0] ,x_bound[0]]
+    x_bound2 = [x_initial[1] ,x_bound[1]]
+    x_bound3 = [x_initial[2] ,x_bound[2]]
+    x_bound4 = [x_initial[3] ,x_bound[3]]
+    x_bound5 = [x_initial[4] ,x_bound[4]]
     bounds = [x_bound1, x_bound2, x_bound3, x_bound4, x_bound5]
   
-    #print(c)
-    #print(Aie)
-    #print(bie)
-    #print(bounds)
-    x_add = []
     Aeq = None
     beq = None
 
     linprogg = linprog(c, A_ub= Aie, b_ub= bie, A_eq= Aeq, b_eq= beq, bounds= bounds)
-    print(linprogg)
-    x = linprogg.x
 
-    for i in range(5):
-        #print(x[i])
-        #print(x_initial[i])
-        x[i] = x[i] - x_initial[i]
-        x_add.append(round(x[i]))
+    x_add = linprogg.x - x_initial
+    x_add = np.around(x_add)
 
     print("X_add is ", x_add)
 
@@ -264,8 +243,8 @@ if __name__ == "__main__":
     prob1, prob2, MEAN_t, MEDIAN_t, MEAN_d, VARIANCE_d,prob3, prob4, ALE = Task1(a, b, c, point1, point2, data, mu, sigma, xm, alpha,
 num, point3, point4, point5)
     """
-    # TASK 2
     """
+    # TASK 2
     num = 120
     eventA = 2 #column 2 of table
     eventB = [0,1] #row 0 and row 1 of table
@@ -274,6 +253,7 @@ num, point3, point4, point5)
 
     prob1, prob2, IsInd, prob3, prob4 = Task2(num, table, eventA, eventB, probs)
     """
+    
     # TASK 3
     x = [[5,4,8,8,2,5,5,7,8,8],[3,7,7,2,2,5,10,4,6,3],[8,3,6,7,9,10,6,2,2,3],[9,3,9,3,10,4,2,3,7,5],
     [4,9,6,6,10,3,8,8,4,6]]
